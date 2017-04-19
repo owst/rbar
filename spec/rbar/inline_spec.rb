@@ -51,6 +51,31 @@ module Rbar
       expect_rewrite(src, 3, expected)
     end
 
+    it 'inlines the first variable if multiple are identified by the range' do
+      src = <<~'SRC'
+        class Foo
+          def some_method
+            x = 1
+            y = 2
+            puts x, y
+          end
+        end
+      SRC
+
+      expected = <<~'EXPECTED'
+        class Foo
+          def some_method
+            y = 2
+            puts 1, y
+          end
+        end
+      EXPECTED
+
+      buffer = buffer(src)
+      range = buffer.line_range(3).join(buffer.line_range(4))
+      expect(Inline.rewrite(buffer, range: range)).to eq expected
+    end
+
     it 'inlines a used-once variable inside nested modules' do
       src = <<~'SRC'
         module Foo
