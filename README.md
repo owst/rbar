@@ -1,36 +1,45 @@
-# Rbar
+# rbar
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rbar`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+`rbar` is a simple AST-based Ruby refactoring tool.
 
 ## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'rbar'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
 
     $ gem install rbar
 
 ## Usage
 
-TODO: Write usage instructions here
+  To inline a variable declared in the "rectangle" whose top-left corner is at
+  line l1, and column c1 and whose bottom-right corner is at line l2 column c2:
 
-## Development
+    rbar inline FILENAME l1:c1 l2:c2
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+  e.g. for a file foo.rb containing:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+    class Foo
+      def foo(bar)
+        baz = bar + 1
+        puts "baz is #{baz}"
+      end
+    end
+
+  we can inline `bar` with:
+
+    rbar inline foo.rb 3:5 3:7
+
+  which will emit
+
+    class Foo
+      def foo(bar)
+        puts "baz is #{bar + 1}"
+      end
+    end
+
+  on STDOUT.
+
+  N.B. if the variable source range must intersect with the input rectangle
+  range. If multiple variables are identified by this intersection, the first
+  is chosen to be inlined.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/rbar.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/owst/rbar.
