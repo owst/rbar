@@ -94,10 +94,12 @@ module Rbar
         end
       end
 
-      def on_block(node)
-        _, args, _ = *node
+      def on_def(node)
+        super unless binds_same_arg?(node)
+      end
 
-        super unless args.children.any? { |arg| same_name?(arg) }
+      def on_block(node)
+        super unless binds_same_arg?(node)
       end
 
       def on_opasgn(node)
@@ -117,6 +119,12 @@ module Rbar
       end
 
       private
+
+      def binds_same_arg?(node)
+        _, args, _ = *node
+
+        args.children.any? { |arg| same_name?(arg) }
+      end
 
       def same_name?(node)
         node.loc.name.source == @name.to_s

@@ -51,13 +51,48 @@ module Rbar
       expect_rewrite(src, 3, expected)
     end
 
+    it 'inlines the first variable across scopes if multiple are identified by the range' do
+      src = <<~'SRC'
+        class Foo
+          def some_method
+            x = 1
+            p x
+          end
+        end
+
+        class Bar
+          def some_method
+            p x
+          end
+        end
+      SRC
+
+      expected = <<~'EXPECTED'
+        class Foo
+          def some_method
+            p 1
+          end
+        end
+
+        class Bar
+          def some_method
+            p x
+          end
+        end
+      EXPECTED
+
+      buffer = buffer(src)
+      range = buffer.line_range(1).join(buffer.line_range(13))
+      expect(Inline.rewrite(buffer, range: range)).to eq expected
+    end
+
     it 'inlines the first variable if multiple are identified by the range' do
       src = <<~'SRC'
         class Foo
           def some_method
             x = 1
             y = 2
-            puts x, y
+            p [x, y]
           end
         end
       SRC
@@ -66,7 +101,7 @@ module Rbar
         class Foo
           def some_method
             y = 2
-            puts 1, y
+            p [1, y]
           end
         end
       EXPECTED
@@ -74,6 +109,97 @@ module Rbar
       buffer = buffer(src)
       range = buffer.line_range(3).join(buffer.line_range(4))
       expect(Inline.rewrite(buffer, range: range)).to eq expected
+    end
+
+    it "doesn't inline variable of the same name bound by a method" do
+      src = <<~'SRC'
+        class X
+          def foo
+            x = 1
+            bar(x)
+          end
+
+          def bar(x)
+            @my_x = x
+          end
+        end
+      SRC
+
+      expected = <<~'EXPECTED'
+        class X
+          def foo
+            bar(1)
+          end
+
+          def bar(x)
+            @my_x = x
+          end
+        end
+      EXPECTED
+
+      expect_rewrite(src, 3, expected)
+    end
+
+    it "doesn't inline across methods" do
+      src = <<~'SRC'
+        class X
+          def foo
+            x = 1
+            p x
+          end
+
+          def bar
+            p x
+          end
+        end
+      SRC
+
+      expected = <<~'EXPECTED'
+        class X
+          def foo
+            p 1
+          end
+
+          def bar
+            p x
+          end
+        end
+      EXPECTED
+
+      expect_rewrite(src, 3, expected)
+    end
+
+    it "doesn't inline across classes" do
+      src = <<~'SRC'
+        class X
+          def foo
+            x = 1
+            p x
+          end
+        end
+
+        class Y
+          def bar
+            p x
+          end
+        end
+      SRC
+
+      expected = <<~'EXPECTED'
+        class X
+          def foo
+            p 1
+          end
+        end
+
+        class Y
+          def bar
+            p x
+          end
+        end
+      EXPECTED
+
+      expect_rewrite(src, 3, expected)
     end
 
     it 'inlines a used-once variable inside nested modules' do
