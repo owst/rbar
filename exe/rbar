@@ -1,31 +1,4 @@
 #!/usr/bin/env ruby
 
 require 'rbar'
-require 'active_support/inflector/methods'
-
-raise ArgumentError, "Requires action, filename, line:column line:column" unless ARGV.size == 4
-
-action, filename, start_range_spec, end_range_spec = ARGV
-
-buffer = Parser::Source::Buffer.new(filename)
-buffer.read
-
-def to_line_col(range_spec)
-  range_spec.split(':').map(&:to_i)
-end
-
-start_line, start_col = to_line_col(start_range_spec)
-end_line, end_col = to_line_col(end_range_spec)
-
-start_line = buffer.line_range(start_line)
-start_range = Parser::Source::Range.new(
-  buffer,
-  start_line.begin_pos + start_col,
-  start_line.end_pos
-)
-
-end_range = buffer.line_range(end_line).begin
-end_range.resize(end_col)
-
-rewriter = Rbar.const_get(ActiveSupport::Inflector.camelize(action))
-puts rewriter.rewrite(buffer, range: start_range.join(end_range))
+Rbar::Cli.start(ARGV)
