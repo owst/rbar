@@ -11,7 +11,7 @@
   To inline a variable declared in the "rectangle" whose top-left corner is at
   line l1, and column c1 and whose bottom-right corner is at line l2 column c2:
 
-    rbar inline FILENAME l1:c1 l2:c2
+    rbar inline --file FILENAME --start-pos l1:c1 --end-pos l2:c2
 
   e.g. for a file foo.rb containing:
 
@@ -24,7 +24,7 @@
 
   we can inline `bar` with:
 
-    rbar inline foo.rb 3:5 3:7
+    rbar inline --file foo.rb --start-pos 3:5 --end-pos 3:7
 
   which will emit
 
@@ -36,7 +36,7 @@
 
   on STDOUT.
 
-  N.B. if the variable source range must intersect with the input rectangle
+  N.B. the variable source range must intersect with the input rectangle
   range. If multiple variables are identified by this intersection, the first
   is chosen to be inlined.
 
