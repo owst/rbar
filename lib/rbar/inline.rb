@@ -102,10 +102,6 @@ module Rbar
         super unless binds_same_arg?(node)
       end
 
-      def on_opasgn(node)
-        modifying_assignment?(node) ? reset : super
-      end
-
       def reset
         @replacements = []
       end

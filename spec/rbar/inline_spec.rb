@@ -333,6 +333,27 @@ module Rbar
       expect_rewrite(src, 2, expected)
     end
 
+    it 'inlines a variable used in a +=' do
+      src = <<~'SRC'
+        def some_method
+          x = 1
+          y = 1
+          y += x
+          p y
+        end
+      SRC
+
+      expected = <<~'EXPECTED'
+        def some_method
+          y = 1
+          y += 1
+          p y
+        end
+      EXPECTED
+
+      expect_rewrite(src, 2, expected)
+    end
+
     it "doesn't inline an unused variable" do
       src = <<~'SRC'
         def some_method
