@@ -22,7 +22,7 @@
       end
     end
 
-  we can inline `bar` with:
+  we can inline `baz` with:
 
     rbar inline --file foo.rb --start-pos 3:5 --end-pos 3:7
 
