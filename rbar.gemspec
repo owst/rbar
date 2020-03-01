@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Owen Stephens"]
   spec.email         = ["owen@owenstephens.co.uk"]
 
-  spec.summary       = 'summary'
-  spec.description   = 'desc'
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = 'Ruby AST-based Refactoring'
+  spec.description   = 'Ruby AST-based Refactoring'
+  spec.homepage      = "https://github.com/owst/rbar"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
