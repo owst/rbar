@@ -119,7 +119,13 @@ module Rbar
       def binds_same_arg?(node)
         _, args, _ = *node
 
-        args.children.any? { |arg| same_name?(arg) }
+        args.children.any? do |arg|
+          if arg.type == :mlhs
+            arg.children.any? { |nested_arg| same_name?(nested_arg) }
+          else
+            same_name?(arg)
+          end
+        end
       end
 
       def same_name?(node)
