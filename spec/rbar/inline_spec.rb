@@ -439,5 +439,29 @@ module Rbar
 
       expect_rewrite(src, 2, src)
     end
+
+    it "doesn't exhibit issue #1" do
+      src = <<~'SRC'
+        CONST = 123
+
+        {
+        }.each do |(a, b, c, d), expected|
+          x = a ? 1 : 2
+
+          Foo.new(x: x, y: 10)
+        end
+      SRC
+
+      expected = <<~'EXPECTED'
+        CONST = 123
+
+        {
+        }.each do |(a, b, c, d), expected|
+          Foo.new(x: a ? 1 : 2, y: 10)
+        end
+      EXPECTED
+
+      expect_rewrite(src, 5, expected)
+    end
   end
 end
